@@ -1,0 +1,83 @@
+body {
+	background-image: url('/images/wallpaper.jpg');
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+.blink {
+	animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+	50% {
+		opacity: 0;
+	}
+}
+
+.container {
+	background-color: black;
+	border: 0;
+	width: 100%;
+	height: 20%;
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+}
+
+.container .clock {
+	float: left;
+	width: 35%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+}
+
+.clock-container {
+	width: 100%;
+}
+
+.container .timeslot {
+	float: left;
+	width: 13%;
+	height: 100%;
+	text-align: center;
+	display: flex;
+	align-items: center;
+}
+
+.timeslot-container {
+	width: 100%;
+}
+
+.container .title {
+	color: yellow;
+	font-size: 300%;
+}
+
+@font-face {
+	font-family: 'Open 24 Display ST';
+	src: url('/fonts/clock_font.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Digital 7';
+	src: url('/fonts/clock_font_mono.ttf') format('truetype');
+}
+
+.container .time {
+	color: white;
+	width: 100%;
+	text-align: center;
+	font-size: 700%;
+	font-family: 'Digital 7';
+}
+
+.clock .time {
+	font-size: 1000%;
+}
+
+.clock .ampm {
+	font-size: 100%;
+	color: white;
+}
+
