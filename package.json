@@ -1,0 +1,17 @@
+{
+  "name": "libre-jamazan",
+  "version": "1.0.0",
+  "description": "[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hasyimibhar/libre-jamazan.git"
+  },
+  "author": "",
+  "homepage": "https://github.com/hasyimibhar/libre-jamazan#readme",
+  "dependencies": {
+    "csv-parser": "^2.3.1",
+    "express": "^4.17.1",
+    "moment": "^2.24.0"
+  }
+}
