@@ -1,6 +1,7 @@
 let currentDate = '';
 let currentPrayerTimes = null;
 let currentPrayer = null;
+let adjustment = moment.duration(0); // for debugging
 
 function playAzan() {
 	const alarm = new Audio('/audio/azan.ogg');
@@ -29,7 +30,7 @@ function tick() {
 	notifyNextPrayerTime();
 
 	// Update prayer times whenever date changes
-	let newDate = moment().format('YYYY-MM-DD');
+	let newDate = moment().add(adjustment).format('YYYY-MM-DD');
 	if (newDate != currentDate) {
 		currentDate = newDate;
 		updatePrayerTimes();
@@ -39,32 +40,23 @@ function tick() {
 }
 
 function showTime() {
-	var date = new Date();
-	var h = date.getHours(); // 0 - 23
-	var m = date.getMinutes(); // 0 - 59
-	var s = date.getSeconds(); // 0 - 59
-	var session = "AM";
-
-	if (h == 0) {
-		h = 12;
-	}
-	if (h > 12) {
-		h = h - 12;
-		session = "PM";
-	}
+	var date = moment().add(adjustment); 
+	var h = date.hours();
+	var m = date.minutes();
+	var s = date.seconds();
 
 	h = (h < 10) ? "0" + h : h;
 	m = (m < 10) ? "0" + m : m;
 	s = (s < 10) ? "0" + s : s;
 
 	var time = h + ":" + m + ":" + s;
-	document.getElementById("clock").innerText = time;
-	document.getElementById("clock").textContent = time;
+
+	document.getElementById("clock").innerHTML = time;
 }
 
 function getNextPrayer() {
 	const prayers = ['subuh', 'zohor', 'asar', 'maghrib', 'isyak'];
-	const now = moment();
+	const now = moment().add(adjustment);
 
 	for (const prayer of prayers) {
 		if (now.isBefore(currentPrayerTimes[prayer])) {
@@ -78,8 +70,9 @@ function notifyNextPrayerTime() {
 		return;
 	}
 
-	const now = moment();
+	const now = moment().add(adjustment);
 	const next = getNextPrayer();
+
 	if (!currentPrayer) {
 		if (now.isAfter(currentPrayerTimes[next].clone().subtract(5, 'minutes'))) {
 			const surah = new Audio('/audio/surah_almulk.ogg');
@@ -108,7 +101,7 @@ function setBlinking(prayer, blink) {
 }
 
 function updatePrayerTimes() {
-	const date = moment();
+	const date = moment().add(adjustment);
 	const url = '/prayer_times?date=' + date.format('YYYY-MM-DD');
 
 	fetch(url).then(response => response.json())
