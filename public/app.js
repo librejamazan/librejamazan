@@ -3,7 +3,7 @@ let currentPrayerTimes = null;
 let currentPrayer = null;
 
 function playAzan() {
-	const alarm = new Audio('/audio/azan.mp3');
+	const alarm = new Audio('/audio/azan.ogg');
 	alarm.play();
 
 	setTimeout(() => {
@@ -12,7 +12,7 @@ function playAzan() {
 }
 
 function playAlarm(duration, cb) {
-	const alarm = new Audio('/audio/alarm.mp3');
+	const alarm = new Audio('/audio/alarm.ogg');
 	alarm.play();
 
 	setTimeout(() => {
@@ -82,7 +82,7 @@ function notifyNextPrayerTime() {
 	const next = getNextPrayer();
 	if (!currentPrayer) {
 		if (now.isAfter(currentPrayerTimes[next].clone().subtract(5, 'minutes'))) {
-			const surah = new Audio('/audio/surah_almulk.mp3');
+			const surah = new Audio('/audio/surah_almulk.ogg');
 			surah.play();
 
 			setBlinking(next, true);
