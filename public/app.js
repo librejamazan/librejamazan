@@ -2,6 +2,7 @@ let currentDate = '';
 let currentPrayerTimes = null;
 let currentPrayer = null;
 let adjustment = moment.duration(0); // for debugging
+const surah = new Audio('/audio/surah_almulk.ogg');
 
 function playAzan() {
 	const alarm = new Audio('/audio/azan.ogg');
@@ -26,15 +27,15 @@ function playAlarm(duration, cb) {
 
 // tick is called every second.
 function tick() {
-	showTime();
-	notifyNextPrayerTime();
-
 	// Update prayer times whenever date changes
 	let newDate = moment().add(adjustment).format('YYYY-MM-DD');
 	if (newDate != currentDate) {
 		currentDate = newDate;
 		updatePrayerTimes();
 	}
+
+	showTime();
+	notifyNextPrayerTime();
 
 	setTimeout(tick, 1000);
 }
@@ -60,9 +61,14 @@ function getNextPrayer() {
 
 	for (const prayer of prayers) {
 		if (now.isBefore(currentPrayerTimes[prayer])) {
-			return prayer;
+			return [prayer, currentPrayerTimes[prayer]];
 		}
 	}
+
+	return [
+		'subuh',
+		currentPrayerTimes['subuh'].clone().add(1, 'days'),
+	];
 }
 
 function notifyNextPrayerTime() {
@@ -74,18 +80,20 @@ function notifyNextPrayerTime() {
 	const next = getNextPrayer();
 
 	if (!currentPrayer) {
-		if (now.isAfter(currentPrayerTimes[next].clone().subtract(5, 'minutes'))) {
-			const surah = new Audio('/audio/surah_almulk.ogg');
+		if (now.isAfter(next[1].clone().subtract(5, 'minutes'))) {
+			surah.currentTime = 0;
 			surah.play();
 
-			setBlinking(next, true);
-			currentPrayer = next;
+			setBlinking(next[0], true);
+			currentPrayer = next[0];
 		}
 	} else {
 		if (now.isSame(currentPrayerTimes[currentPrayer].clone(), 'second')) {
 			// TODO: it's possible this might not get triggered, or triggered more than once
+			surah.pause();
 			playAlarm(5000, () => playAzan());
 		} else if (now.isAfter(currentPrayerTimes[currentPrayer].clone().add(1, 'minutes'))) {
+			surah.pause();
 			setBlinking(currentPrayer, false);
 			currentPrayer = null;
 		}
@@ -104,6 +112,8 @@ function updatePrayerTimes() {
 	const date = moment().add(adjustment);
 	const url = '/prayer_times?date=' + date.format('YYYY-MM-DD');
 
+	const prayers = ['subuh', 'zohor', 'asar', 'maghrib', 'isyak'];
+
 	fetch(url).then(response => response.json())
 	.then(data => {
 		document.getElementById('subuh').innerHTML = data['subuh'];
@@ -113,12 +123,20 @@ function updatePrayerTimes() {
 		document.getElementById('isyak').innerHTML = data['isyak'];
 
 		currentPrayerTimes = {
+			'date': date.format('YYYY-MM-DD'),
 			'subuh': moment(data['subuh'], 'HH:mm'),
 			'zohor': moment(data['zohor'], 'HH:mm'),
 			'asar': moment(data['asar'], 'HH:mm'),
 			'maghrib': moment(data['maghrib'], 'HH:mm'),
 			'isyak': moment(data['isyak'], 'HH:mm'),
 		};
+
+		// Make sure date is updated
+		for (const prayer of prayers) {
+			currentPrayerTimes[prayer].year(date.year());
+			currentPrayerTimes[prayer].month(date.month());
+			currentPrayerTimes[prayer].date(date.date());
+		}
 	});
 }
 
